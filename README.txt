@@ -11,6 +11,8 @@ SimulatedAnnealingTSP outputs a file with the same name as the input file with
 ".SimulatedAnnealingTour" appended to the end of it. This file is placed in the
 same directory as the input file.
 
+Change Temperature and coolingRate in SimulatedAnnealingTSP.java to adjust timing.
+
 To compile:
   javac SimulatedAnnealingTSP.java City.java Tour.java
 
