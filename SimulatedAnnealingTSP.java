@@ -7,8 +7,8 @@ import java.util.Collections;
 public class SimulatedAnnealingTSP {
 
   //INITIAL ANNEALING VALUES
-  static double temperature = 1000000;
-  static double coolingRate = .99999;
+  static double temperature = 100000;
+  static double coolingRate = .9999;
 
   //Create arrayList for passed cities
   private static ArrayList<City> citiesList = new ArrayList<City>();
@@ -97,8 +97,7 @@ public class SimulatedAnnealingTSP {
 
     //Output stuff.
     System.out.println("Length: " + bestTour.calculateTourLength());
-    System.out.println("Time: " + duration);
-
+    System.out.println("Time: " + duration + " seconds");
 
     String outputPath = path + ".SimulatedAnnealingTour";
     try{
