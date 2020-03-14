@@ -8,8 +8,8 @@ NOTES:
     https://www.baeldung.com/java-simulated-annealing-for-traveling-salesman
 
 SimulatedAnnealingTSP outputs a file with the same name as the input file with
-".SimulatedAnnealingTour" appended to the end of it. This file is placed in the
-same directory as the input file.
+".tour" appended to the end of it. This file is placed in the
+same directory as the java file.
 
 To compile:
   javac SimulatedAnnealingTSP.java City.java Tour.java
@@ -20,4 +20,4 @@ To run:
   Example:
     java SimulatedAnnealingTSP CS325TSP_Files/tsp_example_1.txt
   Output file will be:
-    CS325TSP_Files/tsp_example_1.txt.SimulatedAnealingTSP  
+    ./tsp_example_1.txt.tour

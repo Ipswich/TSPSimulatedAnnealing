@@ -1,14 +1,23 @@
 import java.lang.Math;
 import java.io.*;
+import java.nio.file.*;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 public class SimulatedAnnealingTSP {
 
-  //INITIAL ANNEALING VALUES
-  static double temperature = 100000;
-  static double coolingRate = .9999;
+
+
+  //COOLING FUNCTIONS
+  private static double boltzmann(double t, long i){
+    return t / Math.log(i);
+  }
+
+  private static double standard(double t, double rate){
+    return t * rate;
+  }
 
   //Create arrayList for passed cities
   private static ArrayList<City> citiesList = new ArrayList<City>();
@@ -17,9 +26,6 @@ public class SimulatedAnnealingTSP {
     return citiesList.size();
   }
 
-  public static City getCityByIndex(int index){
-    return citiesList.get(index);
-  }
 
 ///////////////////////////////////////////////////////////////////
 
@@ -31,6 +37,8 @@ public class SimulatedAnnealingTSP {
     }
     //Reading file stuff
     String path = args[0];
+    Path input = Paths.get(path);
+
     //Try to parse cities into the arrayList
     try{
       FileInputStream fs = new FileInputStream(path);
@@ -52,54 +60,76 @@ public class SimulatedAnnealingTSP {
       e.printStackTrace();
     }
 
-    //Setup for annealing
-    int problemSize = citiesList.size();
-    Tour currentTour = new Tour();
+//////////Setup for annealing//////////
+
+    //INITIAL ANNEALING VALUES
+    double startTemperature = 1000000;
+    double finishTemperature = .01;
+    double coolingRate = .999999;
+    int iterationsPerTemperature = 1;
+    long seed = 2;
+
     //Generate inital tour from citiesList
+    Tour currentTour = new Tour();
     for(int i = 0; i < citiesList.size(); i++){
       currentTour.setCityByIndex(citiesList.get(i), i);
     }
 
-    //Annealing the crap out of it.
+    //Randomize
+    Collections.shuffle(currentTour.getTour(), new Random(seed));
+
     Tour bestTour = new Tour(currentTour.getTour());
     long startTime = System.nanoTime();
+    long pass = 0;
+    double currentTemperature = startTemperature;
 
-    while (temperature > 1){
-      //Create mutation of currentTour.
-      Tour newTour = new Tour(currentTour.getTour());
-      newTour.swapCities();
+/////////ANNEALING LOOP///////////
+    System.out.println("Initial length: " + currentTour.calculateTourLength());
+    while (currentTemperature > finishTemperature){
+      pass++;
+      //Iterate per temperature
+      for (int i = 0; i < iterationsPerTemperature; i++) {
+        //Create mutation of currentTour.
+        Tour newTour = new Tour(currentTour.getTour());
+        newTour.swapCities();
 
-      //Calculate energies (distances) of two tours to compare.
-      int currentEnergy = currentTour.calculateTourLength();
-      int newEnergy = newTour.calculateTourLength();
+        //Calculate energies (distances) of two tours to compare.
+        int currentEnergy = currentTour.calculateTourLength();
+        int newEnergy = newTour.calculateTourLength();
 
-      //Stochastically decide if we should accept the new mutation.
-      double val;
-      if(currentEnergy > newEnergy){
-        val = 1;
-      } else {
-        val = Math.exp((currentEnergy - newEnergy) / temperature);
+        //If new tour is shorter than old tour, accept, else, calculate acceptance probability.
+        double val;
+        if(currentEnergy > newEnergy){
+          val = 1;
+        } else {
+          val = Math.exp(-(newEnergy - currentEnergy) / currentTemperature);
+        }
+
+        //Stochastically decide if we should accept the new mutation.
+        if(val > Math.random()) {
+          currentTour = new Tour(newTour.getTour());
+        }
+
+        //Calculate distances to compare to the best tour and update if necessary.
+        if(currentTour.calculateTourLength() < bestTour.calculateTourLength()){
+          bestTour = new Tour(currentTour.getTour());
+        }
       }
-      if (val > Math.random()) {
-        currentTour = new Tour(newTour.getTour());
-      }
-
-      //Calculate distances to compare to the best tour and update if necessary.
-      if(currentTour.calculateTourLength() < bestTour.calculateTourLength()){
-        bestTour = new Tour(currentTour.getTour());
-      }
-      //Update temperature
-      temperature = temperature * coolingRate;
+      // Update temperature
+      // currentTemperature = boltzmann(temperature, pass);
+      currentTemperature = standard(currentTemperature, coolingRate);
     }
-    long endTime = System.nanoTime();
+//////////END OF LOOP/////////
+
     //Algorithm run time
+    long endTime = System.nanoTime();
     long duration = (endTime - startTime)/1000000000;
 
     //Output stuff.
     System.out.println("Length: " + bestTour.calculateTourLength());
     System.out.println("Time: " + duration + " seconds");
 
-    String outputPath = path + ".SimulatedAnnealingTour";
+    String outputPath = input.getFileName() + ".tour";
     try{
       PrintWriter output = new PrintWriter(outputPath, "UTF-8");
       output.println(bestTour.calculateTourLength());

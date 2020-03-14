@@ -38,11 +38,6 @@ public class Tour{
     return this.tour;
   }
 
-  //Returns the city in the tour located at the passed index.
-  public City getCityByIndex(int index){
-    return this.tour.get(index);
-  }
-
 /*
 ---------SETTERS----------
 */
@@ -84,6 +79,22 @@ public void swapCities(){
   //Randomly select two tour indices
   int index1 = (int) (this.tour.size() * Math.random());
   int index2 = (int) (this.tour.size() * Math.random());
+
+  City a = tour.get(index1);
+  City b = tour.get(index2);
+
+  this.tour.set(index1, b);
+  this.tour.set(index2, a);
+}
+
+public void swapNeighborCities(){
+
+  //Randomly select two tour indices
+  int index1 = (int) (this.tour.size() * Math.random());
+  int index2 = index1 + 1;
+  if (index1 == this.tour.size() - 1){
+    index2 = 0;
+  }
 
   City a = tour.get(index1);
   City b = tour.get(index2);
