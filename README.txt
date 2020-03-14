@@ -21,3 +21,10 @@ To run:
     java SimulatedAnnealingTSP CS325TSP_Files/tsp_example_1.txt
   Output file will be:
     ./tsp_example_1.txt.tour
+
+Input files must contain a series of lines in the following format:
+  i x y
+Where
+  i is the city identifier (integer),
+  x is the city's x-coordinate (integer), 
+  y is the city's y-coordinate (integer).
